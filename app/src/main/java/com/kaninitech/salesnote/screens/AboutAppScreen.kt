@@ -1,7 +1,6 @@
 package com.kaninitech.salesnote.screens
 
 
-
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
@@ -23,6 +22,7 @@ import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.utils.DynamicStatusBar
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +70,7 @@ fun AboutAppScreen(navController: NavController) {
 
             Text(
                 //set reminders,
-                text = "Version: 1.0.1",
+                text = "Version: 1.0.2",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp)
             )

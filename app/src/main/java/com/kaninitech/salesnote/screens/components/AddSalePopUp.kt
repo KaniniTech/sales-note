@@ -2,7 +2,6 @@ package com.kaninitech.salesnote.screens.components
 
 
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -58,6 +57,7 @@ import androidx.compose.material3.*
 @Composable
 fun AddSalePopUp(
     onDismiss: () -> Unit,
+    onClearProducts: () -> Unit, // new callback
     total: Double,
     items: List<NamePriceItem>
 ) {
@@ -287,10 +287,11 @@ fun AddSalePopUp(
                                         )
                                     )
                                 }
+                                onClearProducts()
                                 onDismiss()
                             }
                         },
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(4.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = accentColor)
                     ) {
                         Text("Save", color = Color.White)

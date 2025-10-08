@@ -127,13 +127,7 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF2F4F7) // greyish
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -163,8 +157,9 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
                                         singleProductSaleViewModel.loadProductsByReceipt(sale.receipt)
                                         showPopupDet = true
                                     },
-                                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                                shape = RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(4.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White)
                             ) {
                                 Column(
                                     modifier = Modifier
@@ -220,46 +215,12 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
                     }
 
                 }
-            }
+
 
 
         }
     }
 
-
-    if (showSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showSheet = false },
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text("Additional Notes", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text(selectedNotes)
-                Spacer(modifier = Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                    if (products.isNotEmpty()) {
-                        Text("Items for selected receipt:")
-                        products.forEach {
-                            Text("${it.productName} - Qty: ${it.quantity} - Total: ${it.total}")
-                        }
-                    }
-
-                }
-
-            }
-        }
-    }
 
 
     if (showPopupDet) {

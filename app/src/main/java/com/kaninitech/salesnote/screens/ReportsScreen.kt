@@ -89,13 +89,6 @@ fun ReportsScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF2F4F7) // greyish
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,7 +114,7 @@ fun ReportsScreen(navController: NavController) {
                                     .clickable {
                                         // Handle click if needed
                                     },
-                                shape = RoundedCornerShape(16.dp),
+                                shape = RoundedCornerShape(4.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color.White)
                             ) {
@@ -223,7 +216,7 @@ fun ReportsScreen(navController: NavController) {
                     }
 
                 }
-            }
+
 
 
         }

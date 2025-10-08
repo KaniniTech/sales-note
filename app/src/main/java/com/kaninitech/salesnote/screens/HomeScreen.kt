@@ -2,7 +2,6 @@ package com.kaninitech.salesnote.screens
 
 
 
-
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -51,15 +50,12 @@ import compose.icons.fontawesomeicons.solid.Times
 fun HomeScreen(navController: NavController) {
     val backgroundColor = colorResource(id = R.color.jet)
     DynamicStatusBar(colorResource(id = R.color.jet))
-    // ✅ Define states for search
-    var isSearching by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+
 
     val isHoveredStates = remember {
         mutableStateMapOf(
-            "Share" to false,
-            "Invite" to false,
-            "Edit" to false
+            "Today Sales" to false,
+            "Sales Report" to false
         )
     }
 
@@ -232,19 +228,6 @@ fun HomeScreen(navController: NavController) {
                                 .padding(16.dp)
                         ) {
                         // Remove Button
-//                            Button(
-//                                onClick = {
-//                                    items = items.toMutableList().also { it.removeAt(index) }
-//                                },
-//                                colors = ButtonDefaults.buttonColors(
-//                                    containerColor = Color.Red,
-//                                    contentColor = Color.White
-//                                ),
-//                                shape = RoundedCornerShape(12.dp),
-//                                modifier = Modifier.align(Alignment.End)
-//                            ) {
-//                                Text("Remove")
-//                            }
 
                             IconButton(
                                 onClick = {
@@ -254,10 +237,10 @@ fun HomeScreen(navController: NavController) {
                                     .padding(16.dp)
                                     .size(40.dp)
                                     .background(
-                                        color = backgroundColor,
+                                        color = colorResource(id = R.color.raspberry),
                                         shape = CircleShape
                                     )
-                                    .align(Alignment.Start)
+                                    .align(Alignment.End)
                             ) {
                                 Icon(
                                     imageVector = FontAwesomeIcons.Solid.Times,
@@ -411,10 +394,8 @@ fun HomeScreen(navController: NavController) {
             ) {
 
                 val icons = listOf(
-//                        "Call" to FontAwesomeIcons.Solid.Phone,
                     "Today Sales" to FontAwesomeIcons.Solid.Store,
-                    "Report" to FontAwesomeIcons.Solid.ClipboardList,
-//                    "Cash Sales" to FontAwesomeIcons.Solid.MoneyBillAlt,
+                    "Sales Report" to FontAwesomeIcons.Solid.ClipboardList
                 )
 
                 Row(
@@ -449,7 +430,7 @@ fun HomeScreen(navController: NavController) {
                                                     // Action here
                                                     navController.navigate("singleSalesReport/$formattedTodayDate")
                                                 }
-                                                "Report" -> {
+                                                "Sales Report" -> {
                                                     navController.navigate(Screen.Reports.route)
                                                     Toast.makeText(
                                                         context,
@@ -457,13 +438,6 @@ fun HomeScreen(navController: NavController) {
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 }
-//                                                "Cash Sales" -> {
-//                                                    Toast.makeText(
-//                                                        context,
-//                                                        "View Cash Sales",
-//                                                        Toast.LENGTH_SHORT
-//                                                    ).show()
-//                                                }
                                             }
                                         }
                                     )
@@ -491,37 +465,25 @@ fun HomeScreen(navController: NavController) {
                             }
                         }
 
-
-
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(16.dp))
 
-
-
-
-
-
         }
-
     }
-
 
     if (showPopup) {
         AddSalePopUp(
-            onDismiss = { showPopup = false;    // Reset the list to only one empty item
-                items = listOf(NamePriceItem()) },
+            onDismiss = { showPopup = false },
+       // ;  items = listOf(NamePriceItem())   // Reset the list to only one empty item
+            onClearProducts = { items = listOf(NamePriceItem()) },
             total = total,
             items = items
         )
     }
 
 }
-
-
-
 
 @Preview(showBackground = true)
 @Composable
@@ -537,9 +499,3 @@ data class NamePriceItem(
     val quantity: String = "1"
 )
 
-//data class NamePriceItem(
-//    val name: String = "",
-//    val price: String = "",
-//    val quantity: String = "",
-//    val subTotal: String = "0"
-//)

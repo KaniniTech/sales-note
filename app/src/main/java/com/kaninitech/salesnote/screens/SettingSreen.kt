@@ -1,5 +1,6 @@
 package com.kaninitech.salesnote.screens
 
+import com.kaninitech.salesnote.R
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -24,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.navigation.Screen

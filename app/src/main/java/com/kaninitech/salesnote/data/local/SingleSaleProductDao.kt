@@ -22,6 +22,8 @@ interface SingleSaleProductDao {
     @Update
     suspend fun updateSoldProduct(singleProductEntity: SingleProductEntity)
 
+    @Query("DELETE FROM single_product WHERE receipt = :receipt")
+    suspend fun hardDeleteSalesProductById(receipt: String): Int?
 
     @Query("SELECT * FROM single_product WHERE date = :saleDate")
     fun getAllSingleSalesByDate(saleDate: String): Flow<List<SingleProductEntity>>

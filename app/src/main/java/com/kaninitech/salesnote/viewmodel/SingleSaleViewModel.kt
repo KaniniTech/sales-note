@@ -1,6 +1,7 @@
 package com.kaninitech.salesnote.viewmodel
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kaninitech.salesnote.model.DailySalesReport
@@ -83,6 +84,37 @@ class SingleSaleViewModel(private val singleSaleRepository: SingleSaleRepository
                 .collect { reports ->
                     _dailySalesReports.value = reports
                 }
+        }
+    }
+
+
+
+    fun hardDeleteSalesById(receipt: String) {
+        viewModelScope.launch {
+            singleSaleRepository.hardDeleteSalesById(receipt)
+        }
+    }
+
+    private val _totalMonthSales = MutableStateFlow(0.0f)
+    val totalMonthSales: StateFlow<Float> = _totalMonthSales
+
+    fun getMonthlyTotalSales(currentYearMonth : String) {
+        viewModelScope.launch {
+            Log.d("SaleViewModel", "Fetching monthly sales for: $currentYearMonth")
+            singleSaleRepository.getMonthlyTotalSales(currentYearMonth).collectLatest { total ->
+                _totalMonthSales.value = total
+            }
+        }
+    }
+
+    private val _totalNoOfSaleThisMonth = MutableStateFlow(0)
+    val totalNoOfSaleThisMonth : StateFlow<Int> = _totalNoOfSaleThisMonth
+
+    fun getNumberOfMonthlySales(currentYearMonth : String) {
+        viewModelScope.launch {
+            singleSaleRepository.getNumberOfMonthlySales(currentYearMonth).collectLatest { total ->
+                _totalNoOfSaleThisMonth.value = total
+            }
         }
     }
 

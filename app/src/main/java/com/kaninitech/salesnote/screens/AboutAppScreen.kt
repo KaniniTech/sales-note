@@ -1,7 +1,9 @@
 package com.kaninitech.salesnote.screens
 
 
+import com.kaninitech.salesnote.R
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,11 +20,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.utils.DynamicStatusBar
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +31,15 @@ fun AboutAppScreen(navController: NavController) {
     val backgroundColor = colorResource(id = R.color.jet)
     DynamicStatusBar(backgroundColor) // ✅ Keeps status bar consistent
     val context = LocalContext.current
+
+    val versionName = try {
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        packageInfo.versionName
+    } catch (e: PackageManager.NameNotFoundException) {
+        // This should not happen, but it's good practice to have a fallback
+        e.printStackTrace()
+        "1.0.0"
+    }
 
     Scaffold(
         topBar = {
@@ -70,7 +79,7 @@ fun AboutAppScreen(navController: NavController) {
 
             Text(
                 //set reminders,
-                text = "Version: 1.0.2",
+                text = "Version: $versionName",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
@@ -104,7 +113,7 @@ fun AboutAppScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            val iconCredits = listOf(
+            val CreditForIcon = listOf(
 //
                 "App icon designed by IconsNova from Flaticon",
 
@@ -113,7 +122,7 @@ fun AboutAppScreen(navController: NavController) {
 
                 )
 
-            iconCredits.forEach { credit ->
+            CreditForIcon.forEach { credit ->
                 Text(
                     text = credit,
                     style = if (credit.endsWith(":"))
@@ -127,7 +136,7 @@ fun AboutAppScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             // ✅ External link
             Text(
-                text = "Visit Flaticon: www.flaticon.com",
+                text = "Image Icons Scourced From Flaticon: Visit www.flaticon.com",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = Color.Blue,
                     fontWeight = FontWeight.SemiBold

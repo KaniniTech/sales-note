@@ -2,7 +2,7 @@ package com.kaninitech.salesnote.screens
 
 
 
-
+import com.kaninitech.salesnote.R
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,14 +29,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.screens.components.MoreSaleDetPop
+import com.kaninitech.salesnote.screens.components.SalesSummaryCard
 import com.kaninitech.salesnote.utils.DynamicStatusBar
+import com.kaninitech.salesnote.utils.extractYearMonth
 import com.kaninitech.salesnote.utils.formatDateToReadable
 import com.kaninitech.salesnote.viewmodel.SingleProductSaleViewModel
 import com.kaninitech.salesnote.viewmodel.SingleSaleViewModel
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.MoneyBillAlt
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -45,12 +49,9 @@ import org.koin.androidx.compose.koinViewModel
 fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
     val backgroundColor = colorResource(id = R.color.jet)
     DynamicStatusBar(backgroundColor)
-    // ✅ Define states for search
-    var isSearching by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
-    val sheetState = rememberModalBottomSheetState()
-    var showSheet by remember { mutableStateOf(false) }
+
     var selectedNotes by remember { mutableStateOf("") }
+    var selectedReceipt by remember { mutableStateOf("") }
     var showPopupDet by remember { mutableStateOf(false) }
 
 
@@ -61,9 +62,11 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
     val products by singleProductSaleViewModel.productsForReceipt.collectAsState()
     val singleSale by singleSaleViewModel.singleSale.collectAsState()
 
+    val totalMonthlySales by  singleSaleViewModel.totalMonthSales.collectAsState()
+    val totalNoOfSaleThisMonth by  singleSaleViewModel.totalNoOfSaleThisMonth.collectAsState()
+
     val context = LocalContext.current
-
-
+    val yearMonth = extractYearMonth(itemId.toString())
 
     LaunchedEffect(Unit) {
 
@@ -71,6 +74,9 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
             singleProductSaleViewModel.loadSalesByDate(itemId)
             singleSaleViewModel.getSalesByDate(itemId)
         }
+
+        singleSaleViewModel.getMonthlyTotalSales(yearMonth.toString())
+        singleSaleViewModel.getNumberOfMonthlySales(yearMonth.toString())
     }
 
 
@@ -143,6 +149,14 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
 
                     }else{
 
+                        SalesSummaryCard(
+                            backgroundColor = colorResource(id = R.color.raspberry),
+                            icon = FontAwesomeIcons.Solid.MoneyBillAlt,
+                            title = "This Month’s Sales",
+                            value = totalMonthlySales.toString(),
+                            subtitle = "No. Of Sales: $totalNoOfSaleThisMonth"
+                        )
+
                         // Iterate over sales when not empty
                         for (index in singleSale.indices) {
                             val sale = singleSale[index]
@@ -154,6 +168,7 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
                                     .clickable {
                                         // Handle card click if needed\
                                         selectedNotes = sale.description.ifEmpty { "No Notes Added" }
+                                        selectedReceipt = sale.receipt
                                         singleProductSaleViewModel.loadProductsByReceipt(sale.receipt)
                                         showPopupDet = true
                                     },
@@ -216,8 +231,6 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
 
                 }
 
-
-
         }
     }
 
@@ -227,9 +240,12 @@ fun SingleSalesReportScreen(navController: NavController, itemId: String?) {
         MoreSaleDetPop(
             onDismiss = { showPopupDet = false },
             notes = selectedNotes,
-            items = products
+            items = products,
+            salesDate = itemId.toString(),
+            salesReceipt = selectedReceipt
         )
     }
+
 
 
 

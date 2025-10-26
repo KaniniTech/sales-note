@@ -1,6 +1,6 @@
 package com.kaninitech.salesnote.screens
 
-
+import com.kaninitech.salesnote.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,20 +22,24 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.kaninitech.salesnote.screens.components.SalesSummaryCard
 import com.kaninitech.salesnote.utils.DynamicStatusBar
+import com.kaninitech.salesnote.utils.formatDates
 import com.kaninitech.salesnote.viewmodel.SingleSaleViewModel
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.DollarSign
 import compose.icons.fontawesomeicons.solid.InfoCircle
 import compose.icons.fontawesomeicons.solid.MobileAlt
+import compose.icons.fontawesomeicons.solid.MoneyBillAlt
 import compose.icons.fontawesomeicons.solid.MoneyBillWave
 import compose.icons.fontawesomeicons.solid.Receipt
+import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.University
 import org.koin.androidx.compose.koinViewModel
+import java.time.YearMonth
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,13 +47,29 @@ import org.koin.androidx.compose.koinViewModel
 fun ReportsScreen(navController: NavController) {
     val backgroundColor = colorResource(id = R.color.jet)
     DynamicStatusBar(backgroundColor)
+    val currentYearMonth = remember{ YearMonth.now().toString()} // "2025-05"
+
+    val currentDate =  System.currentTimeMillis()
+    val todayDate = formatDates(currentDate)
+
     // ✅ Define states for search
-    var isSearching by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
     val singleSaleViewModel: SingleSaleViewModel = koinViewModel()
    val dailyReports = singleSaleViewModel.dailySalesReports.collectAsState()
+    val totalMonthlySales by  singleSaleViewModel.totalMonthSales.collectAsState()
+    val totalNoOfSaleThisMonth by  singleSaleViewModel.totalNoOfSaleThisMonth.collectAsState()
 
+
+    // ✅ **Filter the list based on search query**
+    val filteredReportList = dailyReports.value.filter {
+        it.date.contains(searchQuery, ignoreCase = true)
+    }
+
+    LaunchedEffect(Unit) {
+        singleSaleViewModel.getMonthlyTotalSales(currentYearMonth)
+        singleSaleViewModel.getNumberOfMonthlySales(currentYearMonth)
+    }
 
     val context = LocalContext.current
 
@@ -95,18 +115,67 @@ fun ReportsScreen(navController: NavController) {
                         .padding(12.dp)
                 ) {
 
+
+                    if(dailyReports.value.isNotEmpty()){
+                        SalesSummaryCard(
+                            backgroundColor = Color(0xFF56E39F),
+                            icon = FontAwesomeIcons.Solid.MoneyBillAlt,
+                            title = "This Month’s Sales",
+                            value = totalMonthlySales.toString(),
+                            subtitle = "No. Of Sales: $totalNoOfSaleThisMonth"
+                        )
+                    }
+
+                    // 🔍 Search Field
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text(text = "Search with Date...") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = FontAwesomeIcons.Solid.Search,
+                                contentDescription = "Search Icon",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.LightGray),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
+
                     if (dailyReports.value.isEmpty()) {
 
                         EmptyPlaceholder(
                             imageRes = R.drawable.empty, // Your custom drawable
-                            title = "No data Sales available!",
+                            title = "No Sales Sales available!",
                             description = "once sales are added it will appear here"
+                        )
+                    }else if(filteredReportList.isEmpty()) {
+                        EmptyPlaceholder(
+                            imageRes = R.drawable.empty, // Your custom drawable
+                            title = "No Sales data available!",
+                            description = "Seems like what you looking for is not found!"
                         )
                     }else{
 
-                        for (index in dailyReports.value.indices) {
-                            val report = dailyReports.value[index]
 
+
+
+//                        for (index in dailyReports.value.indices) {
+//                            val report = dailyReports.value[index]
+                        for (index in filteredReportList.indices) {
+                            val report = filteredReportList[index]
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -188,7 +257,7 @@ fun ReportsScreen(navController: NavController) {
                                         Text("Bank Payments: ${report.bank}", style = MaterialTheme.typography.bodyMedium)
                                     }
 
-                                    // Mpesa
+                                    // mobile wallet
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
                                             imageVector = FontAwesomeIcons.Solid.MobileAlt,
@@ -196,7 +265,7 @@ fun ReportsScreen(navController: NavController) {
                                             tint = Color(0xFFFF9800),
                                             modifier = Modifier.padding(end = 8.dp).size(18.dp)
                                         )
-                                        Text("M-Pesa Payments: ${report.mpesa}", style = MaterialTheme.typography.bodyMedium)
+                                        Text("Mobile Wallet Payments: ${report.mobile}", style = MaterialTheme.typography.bodyMedium)
                                     }
 
                                     // Other
@@ -228,15 +297,6 @@ fun ReportsScreen(navController: NavController) {
 
 
 
-// ✅ Local book model + list
-data class Report(
-    val date: String,
-    val cash: Int,
-    val bank: Int,
-    val mpesa: Int,
-    val other: Int,
-    val total: Float
-)
 
 
 @Preview(showBackground = true)

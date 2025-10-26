@@ -19,6 +19,10 @@ class SingleProductRepository(private val singleSaleProductDao: SingleSaleProduc
     fun getSingleSalesByDate(saleDate: String): Flow<List<SingleProductEntity>> = singleSaleProductDao.getAllSingleSalesByDate(saleDate)
 
 
+  suspend fun hardDeleteSalesProductById(receipt: String): Int? {
+    return singleSaleProductDao.hardDeleteSalesProductById(receipt)
+  }
+
   fun getSalesSummaryByDate(date: String): Flow<List<Sales>> {
     return singleSaleProductDao.getSalesSummaryByDate(date)
   }

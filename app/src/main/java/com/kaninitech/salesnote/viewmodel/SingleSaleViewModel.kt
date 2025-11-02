@@ -27,7 +27,6 @@ class SingleSaleViewModel(private val singleSaleRepository: SingleSaleRepository
 
 
 
-
     fun insertSingleSale(singleSaleEntity: SingleSaleEntity) {
         viewModelScope.launch {
 //            singleProductRepository.insertSoldProduct(singleProductEntity)

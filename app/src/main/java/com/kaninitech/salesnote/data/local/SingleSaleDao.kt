@@ -52,4 +52,6 @@ interface SingleSaleDao {
     fun getNumberOfMonthlySales(month: String): Flow<Int?>
 
 
+
+
 }

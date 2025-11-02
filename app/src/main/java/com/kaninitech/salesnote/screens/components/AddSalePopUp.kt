@@ -38,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.kaninitech.salesnote.R
 import androidx.compose.ui.window.Dialog
 import com.kaninitech.salesnote.model.SingleProductEntity
 import com.kaninitech.salesnote.model.SingleSaleEntity
@@ -47,10 +48,6 @@ import com.kaninitech.salesnote.viewmodel.SingleProductSaleViewModel
 import com.kaninitech.salesnote.viewmodel.SingleSaleViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.material3.*
-import com.kaninitech.salesnote.R
-
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

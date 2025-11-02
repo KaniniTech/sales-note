@@ -1,6 +1,5 @@
 package com.kaninitech.salesnote.screens.components
 
-import com.kaninitech.salesnote.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -12,6 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaninitech.salesnote.R
 
 @Composable
 fun SalesSummaryCard(

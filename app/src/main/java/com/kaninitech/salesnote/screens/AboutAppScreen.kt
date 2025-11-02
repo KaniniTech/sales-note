@@ -1,7 +1,6 @@
 package com.kaninitech.salesnote.screens
 
 
-import com.kaninitech.salesnote.R
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -20,7 +19,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.kaninitech.salesnote.R
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.utils.DynamicStatusBar
 
@@ -149,7 +150,12 @@ fun AboutAppScreen(navController: NavController) {
                     }
                     .padding(vertical = 4.dp)
             )
-
+            Text(
+                text = "Intellectual Property Notice",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth()
+            )
             Text(
                 //set reminders,
                 text = "All icons, illustrations, animations, and other media" +

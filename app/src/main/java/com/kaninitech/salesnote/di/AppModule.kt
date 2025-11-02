@@ -1,9 +1,11 @@
 package com.kaninitech.salesnote.di
 
 
+import com.kaninitech.salesnote.data.datastore.BusinessDetPrefs
 import com.kaninitech.salesnote.data.local.AppDatabase
 import com.kaninitech.salesnote.repository.SingleProductRepository
 import com.kaninitech.salesnote.repository.SingleSaleRepository
+import com.kaninitech.salesnote.viewmodel.BusinessDetPrefsViewModel
 import com.kaninitech.salesnote.viewmodel.SingleProductSaleViewModel
 import com.kaninitech.salesnote.viewmodel.SingleSaleViewModel
 import org.koin.core.module.dsl.viewModel
@@ -12,6 +14,10 @@ import org.koin.dsl.module
 
 
 val appModule = module {
+
+
+    single { BusinessDetPrefs(get()) }
+    viewModel { BusinessDetPrefsViewModel(get()) }
 
     single{ AppDatabase.manageDatabase(get()).singleSaleProductDao() }
     single { SingleProductRepository(get()) }

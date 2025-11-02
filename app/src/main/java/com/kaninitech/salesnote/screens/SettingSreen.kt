@@ -1,6 +1,5 @@
 package com.kaninitech.salesnote.screens
 
-import com.kaninitech.salesnote.R
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -25,11 +24,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.navigation.Screen
 import com.kaninitech.salesnote.utils.DynamicStatusBar
 import androidx.core.net.toUri
+import com.kaninitech.salesnote.viewmodel.BusinessDetPrefsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +41,10 @@ fun SettingScreen(navController: NavController) {
     val backgroundColor = colorResource(id = R.color.jet)
     DynamicStatusBar(backgroundColor) // ✅ Keeps status bar consistent
     val context = LocalContext.current
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    val businessDetPrefsViewModel: BusinessDetPrefsViewModel = koinViewModel()
+    val userBusinessData by businessDetPrefsViewModel.userBusinessData.collectAsState()
 
     Scaffold(
         topBar = {
@@ -81,12 +87,37 @@ fun SettingScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
+
+
+                    if (userBusinessData.isDataSet && userBusinessData.businessName.isNotBlank()){
+                        SettingsItem(
+                            icon = { Icon(Icons.Filled.Info, contentDescription = "delete brand") },
+                            title = "Delete Branding",
+                            subtitle = "Delete your business details(you can Add new name)",
+                            onClick = { /* Navigate */
+                                showDeleteDialog = true
+                            }
+                        )
+                    }else{
+                        SettingsItem(
+                            icon = { Icon(Icons.Filled.Info, contentDescription = "add brand") },
+                            title = "Branding",
+                            subtitle = "Add your business details",
+                            onClick = { /* Navigate */
+                                navController.navigate(Screen.AddBrand.route)
+                            }
+                        )
+                    }
+
+                    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+
+
                     SettingsItem(
                         icon = { Icon(Icons.Filled.Info, contentDescription = "About") },
                         title = "About",
                         subtitle = "About the app",
                         onClick = { /* Navigate */
-                            navController.navigate(Screen.CreditAuthor.route)
+                            navController.navigate(Screen.AboutApp.route)
                         }
                     )
 
@@ -137,6 +168,31 @@ fun SettingScreen(navController: NavController) {
 
 
         }
+    }
+
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Business Profile") },
+            text = { Text("Delete business Details? You can Add it later") },
+            confirmButton = {
+                TextButton(onClick = {
+                    businessDetPrefsViewModel.clearBusinessData()
+                    Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show()
+                    showDeleteDialog = false
+                }) {
+                    Text("Delete", color = colorResource(id = R.color.jet))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                }) {
+                    Text("Cancel", color = colorResource(id = R.color.gray01))
+                }
+            }
+        )
     }
 }
 
@@ -190,4 +246,5 @@ private fun SettingsItem(
 // Right chevron (optional)
         Text(text = ">", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
     }
+
 }

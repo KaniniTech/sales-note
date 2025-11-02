@@ -1,14 +1,12 @@
 package com.kaninitech.salesnote.screens
 
 
-import com.kaninitech.salesnote.R
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -24,15 +22,18 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kaninitech.salesnote.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kaninitech.salesnote.navigation.Screen
 import com.kaninitech.salesnote.screens.components.AddSalePopUp
 import com.kaninitech.salesnote.utils.DynamicStatusBar
 import com.kaninitech.salesnote.utils.formatDate
+import com.kaninitech.salesnote.viewmodel.BusinessDetPrefsViewModel
 
 
 import compose.icons.FontAwesomeIcons
@@ -42,6 +43,7 @@ import compose.icons.fontawesomeicons.solid.Cog
 import compose.icons.fontawesomeicons.solid.Plus
 import compose.icons.fontawesomeicons.solid.Store
 import compose.icons.fontawesomeicons.solid.Times
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +52,9 @@ fun HomeScreen(navController: NavController) {
     val backgroundColor = colorResource(id = R.color.jet)
     DynamicStatusBar(colorResource(id = R.color.jet))
 
+
+    val businessDetPrefsViewModel: BusinessDetPrefsViewModel = koinViewModel()
+    val userBusinessData by businessDetPrefsViewModel.userBusinessData.collectAsState()
 
     val isHoveredStates = remember {
         mutableStateMapOf(
@@ -70,32 +75,64 @@ fun HomeScreen(navController: NavController) {
     val formattedTodayDate = formatDate(currentDate) // Should return "DD-MM-YYYY"
 
     Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = {
+//                        Text("Home", color = Color.White)
+//
+//                },
+//                actions = {
+//                        IconButton(onClick = {
+//                            navController.navigate(Screen.Settings.route)
+//                        }) {
+//                            Icon(
+//                                imageVector = FontAwesomeIcons.Solid.Cog,
+//                                contentDescription = "settings",
+//                                tint = Color.White,
+//                                modifier = Modifier.size(24.dp)
+//                            )
+//                        }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = backgroundColor, // dark green
+//                    titleContentColor = Color.White,
+//                    navigationIconContentColor = Color.White
+//                )
+//            )
+//        },
         topBar = {
             TopAppBar(
                 title = {
-                        Text("Home", color = Color.White)
-
+                    Text(
+                        text = if (userBusinessData.isDataSet && userBusinessData.businessName.isNotBlank())
+                            userBusinessData.businessName
+                        else
+                            "Home",
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis, // 👈 truncate long names
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 },
                 actions = {
-                        IconButton(onClick = {
-                            navController.navigate(Screen.Settings.route)
-                        }) {
-                            Icon(
-                                imageVector = FontAwesomeIcons.Solid.Cog,
-                                contentDescription = "settings",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                    IconButton(onClick = {
+                        navController.navigate(Screen.Settings.route)
+                    }) {
+                        Icon(
+                            imageVector = FontAwesomeIcons.Solid.Cog,
+                            contentDescription = "Settings",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor, // dark green
+                    containerColor = backgroundColor,
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
                 )
             )
         },
-
 
         bottomBar = {
 
@@ -192,7 +229,7 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier
                     .padding(end = 16.dp, start = 16.dp),
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = colorResource(id = R.color.raspberry)
+                color = colorResource(id = R.color.teal_200)
             )
 //                    Spacer(modifier = Modifier.height(8.dp))
             // Subtitle
@@ -216,151 +253,307 @@ fun HomeScreen(navController: NavController) {
 
 
                     items.forEachIndexed { index, item ->
-                        Column(
+//                        Column(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(horizontal = 8.dp)
+//                                .background(
+//                                    color = colorResource(id = R.color.papaya_whip),
+//                                    shape = RoundedCornerShape(12.dp)
+//                                )
+//                                .padding(16.dp)
+//                        ) {
+//                        // Remove Button
+//
+//                            IconButton(
+//                                onClick = {
+//                                    items = items.toMutableList().also { it.removeAt(index) }
+//                                },
+//                                modifier = Modifier
+//                                    .padding(16.dp)
+//                                    .size(40.dp)
+//                                    .background(
+//                                        color = colorResource(id = R.color.raspberry),
+//                                        shape = CircleShape
+//                                    )
+//                                    .align(Alignment.End)
+//                            ) {
+//                                Icon(
+//                                    imageVector = FontAwesomeIcons.Solid.Times,
+//                                    contentDescription = "times delete",
+//                                    tint = Color.White,
+//                                    modifier = Modifier.size(24.dp)
+//                                )
+//                            }
+//
+//
+//                            // Item Name
+//                            OutlinedTextField(
+//                                value = item.name,
+//                                onValueChange = { newValue ->
+//                                    items = items.toMutableList().also {
+//                                        it[index] = it[index].copy(name = newValue)
+//                                    }
+//                                },
+//                                label = { Text("Item name *") },
+//                                modifier = Modifier.fillMaxWidth(),
+//                                colors = OutlinedTextFieldDefaults.colors(
+//                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+//                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
+//                                    focusedBorderColor = backgroundColor,
+//                                    unfocusedBorderColor = Color.Gray,
+//                                    focusedLabelColor = backgroundColor,
+//                                    cursorColor = backgroundColor
+//                                ),
+//                                isError = item.name.isBlank(),
+//                                singleLine = true,
+//                            )
+//                            if (item.name.isBlank()) {
+//                                Text(
+//                                    text = "Name cannot be empty",
+//                                    color = Color.Red,
+//                                    fontSize = 12.sp
+//                                )
+//                            }
+//
+//                            Spacer(modifier = Modifier.height(8.dp))
+//
+//                            // Price
+//                            OutlinedTextField(
+//                                value = item.price,
+//                                onValueChange = { newValue ->
+//                                    val updatedList = items.toMutableList()
+//                                    val quantityValue = updatedList[index].quantity.toIntOrNull() ?: 0
+//                                    val priceValue = newValue.toDoubleOrNull() ?: 0.0
+//                                    val newSubtotal = (priceValue * quantityValue).toString()
+//                                    updatedList[index] = updatedList[index].copy(
+//                                        price = newValue,
+//                                        subTotal = newSubtotal
+//                                    )
+//                                    items = updatedList
+//                                },
+//                                label = { Text("Price") },
+//                                modifier = Modifier.fillMaxWidth(),
+//                                colors = OutlinedTextFieldDefaults.colors(
+//                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+//                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
+//                                    focusedBorderColor = backgroundColor,
+//                                    unfocusedBorderColor = Color.Gray,
+//                                    focusedLabelColor = backgroundColor,
+//                                    cursorColor = backgroundColor
+//                                ),
+//                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                                isError = item.price.isBlank() || item.price.toDoubleOrNull() == null,
+//                                singleLine = true,
+//                            )
+//
+//                            Spacer(modifier = Modifier.height(8.dp))
+//
+//                            // Quantity
+//                            OutlinedTextField(
+//                                value = item.quantity,
+//                                onValueChange = { newValue ->
+//                                    val updatedList = items.toMutableList()
+//                                    val priceValue = updatedList[index].price.toDoubleOrNull() ?: 0.0
+//                                    val quantityValue = newValue.toIntOrNull() ?: 0
+//                                    val newSubtotal = (priceValue * quantityValue).toString()
+//                                    updatedList[index] = updatedList[index].copy(
+//                                        quantity = newValue,
+//                                        subTotal = newSubtotal
+//                                    )
+//                                    items = updatedList
+//                                },
+//                                label = { Text("Quantity") },
+//                                modifier = Modifier.fillMaxWidth(),
+//                                colors = OutlinedTextFieldDefaults.colors(
+//                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+//                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
+//                                    focusedBorderColor = backgroundColor,
+//                                    unfocusedBorderColor = Color.Gray,
+//                                    focusedLabelColor = backgroundColor,
+//                                    cursorColor = backgroundColor
+//                                ),
+//                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                                isError = item.quantity.isBlank() || item.quantity.toIntOrNull() == null,
+//                                singleLine = true,
+//                            )
+//
+//                            Spacer(modifier = Modifier.height(8.dp))
+//
+//                            // Subtotal (Read-Only)
+//                            OutlinedTextField(
+//                                value = item.subTotal,
+//                                onValueChange = {}, // No editing allowed
+//                                label = { Text("Subtotal") },
+//                                modifier = Modifier.fillMaxWidth(),
+//                                readOnly = true,
+//                                colors = OutlinedTextFieldDefaults.colors(
+//                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+//                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
+//                                    focusedBorderColor = backgroundColor,
+//                                    unfocusedBorderColor = Color.Gray,
+//                                    focusedLabelColor = backgroundColor,
+//                                    cursorColor = backgroundColor
+//                                ),
+//                                singleLine = true,
+//                            )
+//                        }
+
+                        ElevatedCard(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
-                                .background(
-                                    color = colorResource(id = R.color.papaya_whip),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(16.dp)
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = colorResource(id = R.color.papaya_whip)
+                            )
                         ) {
-                        // Remove Button
-
-                            IconButton(
-                                onClick = {
-                                    items = items.toMutableList().also { it.removeAt(index) }
-                                },
+                            Column(
                                 modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(40.dp)
-                                    .background(
-                                        color = colorResource(id = R.color.raspberry),
-                                        shape = CircleShape
-                                    )
-                                    .align(Alignment.End)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 8.dp)
                             ) {
-                                Icon(
-                                    imageVector = FontAwesomeIcons.Solid.Times,
-                                    contentDescription = "times delete",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
+                                // Remove Button
+                                IconButton(
+                                    onClick = {
+                                        items = items.toMutableList().also { it.removeAt(index) }
+                                    },
+                                    modifier = Modifier
+                                        .align(Alignment.End)
+                                        .size(32.dp)
+                                        .background(
+                                            color = colorResource(id = R.color.red),
+                                            shape = RoundedCornerShape(6.dp)
+                                        )
+                                ) {
+                                    Icon(
+                                        imageVector = FontAwesomeIcons.Solid.Times,
+                                        contentDescription = "Delete",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+
+                                // Item Name
+                                OutlinedTextField(
+                                    value = item.name,
+                                    onValueChange = { newValue ->
+                                        items = items.toMutableList().also {
+                                            it[index] = it[index].copy(name = newValue)
+                                        }
+                                    },
+                                    label = { Text("Item name *") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                                        focusedContainerColor = Color.White,
+                                        focusedBorderColor = backgroundColor,
+                                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+                                        focusedLabelColor = backgroundColor,
+                                        cursorColor = backgroundColor
+                                    ),
+                                    isError = item.name.isBlank(),
+                                    singleLine = true,
+                                )
+
+                                if (item.name.isBlank()) {
+                                    Text(
+                                        text = "Name cannot be empty",
+                                        color = Color.Red.copy(alpha = 0.8f),
+                                        fontSize = 12.sp,
+                                        modifier = Modifier.padding(top = 2.dp, start = 4.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                // Price & Quantity in same row
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    // Price
+                                    OutlinedTextField(
+                                        value = item.price,
+                                        onValueChange = { newValue ->
+                                            val updatedList = items.toMutableList()
+                                            val quantityValue = updatedList[index].quantity.toIntOrNull() ?: 0
+                                            val priceValue = newValue.toDoubleOrNull() ?: 0.0
+                                            val newSubtotal = (priceValue * quantityValue).toString()
+                                            updatedList[index] = updatedList[index].copy(
+                                                price = newValue,
+                                                subTotal = newSubtotal
+                                            )
+                                            items = updatedList
+                                        },
+                                        label = { Text("Price") },
+                                        modifier = Modifier.weight(1f),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                                            focusedContainerColor = Color.White,
+                                            focusedBorderColor = backgroundColor,
+                                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+                                            focusedLabelColor = backgroundColor,
+                                            cursorColor = backgroundColor
+                                        ),
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        isError = item.price.isBlank() || item.price.toDoubleOrNull() == null,
+                                        singleLine = true,
+                                    )
+
+                                    // Quantity
+                                    OutlinedTextField(
+                                        value = item.quantity,
+                                        onValueChange = { newValue ->
+                                            val updatedList = items.toMutableList()
+                                            val priceValue = updatedList[index].price.toDoubleOrNull() ?: 0.0
+                                            val quantityValue = newValue.toIntOrNull() ?: 0
+                                            val newSubtotal = (priceValue * quantityValue).toString()
+                                            updatedList[index] = updatedList[index].copy(
+                                                quantity = newValue,
+                                                subTotal = newSubtotal
+                                            )
+                                            items = updatedList
+                                        },
+                                        label = { Text("Qty") },
+                                        modifier = Modifier.weight(1f),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                                            focusedContainerColor = Color.White,
+                                            focusedBorderColor = backgroundColor,
+                                            unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+                                            focusedLabelColor = backgroundColor,
+                                            cursorColor = backgroundColor
+                                        ),
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        isError = item.quantity.isBlank() || item.quantity.toIntOrNull() == null,
+                                        singleLine = true,
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                // Subtotal (Read-Only)
+                                OutlinedTextField(
+                                    value = item.subTotal,
+                                    onValueChange = {},
+                                    label = { Text("Subtotal") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    readOnly = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
+                                        focusedContainerColor = Color.White,
+                                        focusedBorderColor = backgroundColor,
+                                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f),
+                                        focusedLabelColor = backgroundColor,
+                                        cursorColor = backgroundColor
+                                    ),
+                                    singleLine = true,
                                 )
                             }
-
-
-                            // Item Name
-                            OutlinedTextField(
-                                value = item.name,
-                                onValueChange = { newValue ->
-                                    items = items.toMutableList().also {
-                                        it[index] = it[index].copy(name = newValue)
-                                    }
-                                },
-                                label = { Text("Item name *") },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
-                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                                    focusedBorderColor = backgroundColor,
-                                    unfocusedBorderColor = Color.Gray,
-                                    focusedLabelColor = backgroundColor,
-                                    cursorColor = backgroundColor
-                                ),
-                                isError = item.name.isBlank(),
-                                singleLine = true,
-                            )
-                            if (item.name.isBlank()) {
-                                Text(
-                                    text = "Name cannot be empty",
-                                    color = Color.Red,
-                                    fontSize = 12.sp
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Price
-                            OutlinedTextField(
-                                value = item.price,
-                                onValueChange = { newValue ->
-                                    val updatedList = items.toMutableList()
-                                    val quantityValue = updatedList[index].quantity.toIntOrNull() ?: 0
-                                    val priceValue = newValue.toDoubleOrNull() ?: 0.0
-                                    val newSubtotal = (priceValue * quantityValue).toString()
-                                    updatedList[index] = updatedList[index].copy(
-                                        price = newValue,
-                                        subTotal = newSubtotal
-                                    )
-                                    items = updatedList
-                                },
-                                label = { Text("Price") },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
-                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                                    focusedBorderColor = backgroundColor,
-                                    unfocusedBorderColor = Color.Gray,
-                                    focusedLabelColor = backgroundColor,
-                                    cursorColor = backgroundColor
-                                ),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                isError = item.price.isBlank() || item.price.toDoubleOrNull() == null,
-                                singleLine = true,
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Quantity
-                            OutlinedTextField(
-                                value = item.quantity,
-                                onValueChange = { newValue ->
-                                    val updatedList = items.toMutableList()
-                                    val priceValue = updatedList[index].price.toDoubleOrNull() ?: 0.0
-                                    val quantityValue = newValue.toIntOrNull() ?: 0
-                                    val newSubtotal = (priceValue * quantityValue).toString()
-                                    updatedList[index] = updatedList[index].copy(
-                                        quantity = newValue,
-                                        subTotal = newSubtotal
-                                    )
-                                    items = updatedList
-                                },
-                                label = { Text("Quantity") },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
-                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                                    focusedBorderColor = backgroundColor,
-                                    unfocusedBorderColor = Color.Gray,
-                                    focusedLabelColor = backgroundColor,
-                                    cursorColor = backgroundColor
-                                ),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                isError = item.quantity.isBlank() || item.quantity.toIntOrNull() == null,
-                                singleLine = true,
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Subtotal (Read-Only)
-                            OutlinedTextField(
-                                value = item.subTotal,
-                                onValueChange = {}, // No editing allowed
-                                label = { Text("Subtotal") },
-                                modifier = Modifier.fillMaxWidth(),
-                                readOnly = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.White.copy(alpha = 0.9f),
-                                    focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                                    focusedBorderColor = backgroundColor,
-                                    unfocusedBorderColor = Color.Gray,
-                                    focusedLabelColor = backgroundColor,
-                                    cursorColor = backgroundColor
-                                ),
-                                singleLine = true,
-                            )
                         }
+
                     }
 
 
@@ -373,7 +566,7 @@ fun HomeScreen(navController: NavController) {
                             .align(Alignment.Start),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id= R.color.bittersweet), // Green background
+                            containerColor = colorResource(id= R.color.teal_200), //  background
                             contentColor = Color.White          // White text
                         )
                     ) {
